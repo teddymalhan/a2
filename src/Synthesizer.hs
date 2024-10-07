@@ -26,7 +26,7 @@ numberSplit n = [(i, n-i) | i <- [1..n-1]]
     At size 1, it should return a list consisting of the two base expressions
 -}
 baseExpressionsAtSize :: Int -> [Expression]
-
+baseExpressionsAtSize = error "Unimplemented"
 
 {-  This should only return a nonempty list at size 1.
     At size 1, it should return a list consisting of the variable expressions
