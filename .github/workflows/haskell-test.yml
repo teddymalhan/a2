@@ -17,31 +17,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Set up GHC and Stack
-      - name: Set up Haskell
-        uses: haskell/actions/setup@v1
+      # Step 2: Cache GHCup, GHC, Stack, and previous test outputs
+      - name: Cache GHCup, Stack, and dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.ghcup           # Cache GHCup to avoid re-installing GHC/Stack
+            ~/.stack           # Cache Stack environment (dependencies)
+            .stack-work        # Cache local build outputs
+          key: ${{ runner.os }}-stack-test-${{ hashFiles('stack.yaml.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-stack-test
+
+      # Step 3: Set up GHC and Stack (only if not cached)
+      - name: Set up Haskell (only if not cached)
+        if: steps.Cache_GHCup_Stack_and_dependencies.outputs.cache-hit != 'true'
+        uses: haskell-actions/setup@v1
         with:
           ghc-version: "9.0.2"
           stack-version: "latest"
 
-      # Step 3: Cache Stack (Optional for dependencies)
-      - name: Cache Stack
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.stack
-            .stack-work
-          key: ${{ runner.os }}-stack-${{ hashFiles('stack.yaml.lock') }}
-
-      # Step 4: Install dependencies only (if needed)
-      - name: Install dependencies
-        run: stack setup && stack build --only-dependencies
-
-      # Step 5: Run the tests without building the entire project
+      # Step 4: Run the stack test directly (without building the project)
       - name: Run tests
         run: stack test --fast -j4
 
-      # Step 6: Upload test logs if the tests fail (with v4)
+      # Step 5: Upload test logs (if tests fail)
       - name: Upload test logs
         if: failure()
         uses: actions/upload-artifact@v4
