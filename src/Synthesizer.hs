@@ -26,7 +26,8 @@ numberSplit n = [(i, n-i) | i <- [1..n-1]]
     At size 1, it should return a list consisting of the two base expressions
 -}
 baseExpressionsAtSize :: Int -> [Expression]
-baseExpressionsAtSize = error "Unimplemented"
+baseExpressionsAtSize _ = []
+baseExpressionsAtSize 1 = [EBase True, EBase False]
 
 {-  This should only return a nonempty list at size 1.
     At size 1, it should return a list consisting of the variable expressions
@@ -34,7 +35,8 @@ baseExpressionsAtSize = error "Unimplemented"
     HINT: fmap will be useful here.
 -}
 varExpressionsAtSize :: Context -> Int -> [Expression]
-varExpressionsAtSize = error "Unimplemented"
+varExpressionsAtSize _ 0 = []
+varExpressionsAtSize (Context ctx) 1 = fmap EVariable ctx
 
 {-  At size 0, it should return an empty list.
     At other sizes, it should call the provided function to get expressions of
