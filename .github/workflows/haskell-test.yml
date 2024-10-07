@@ -1,12 +1,12 @@
-name: Haskell CI
+name: Haskell Test
 
 on:
   push:
     branches:
-      - main # You can change this to whatever branch you want to run the tests on
+      - main
   pull_request:
     branches:
-      - main # Run tests on pull requests to `main` as well
+      - main
 
 jobs:
   test:
@@ -24,27 +24,27 @@ jobs:
           ghc-version: "9.0.2"
           stack-version: "latest"
 
-      # Step 3: Cache Stack dependencies to speed up future builds
+      # Step 3: Cache Stack (Optional for dependencies)
       - name: Cache Stack
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ~/.stack
             .stack-work
           key: ${{ runner.os }}-stack-${{ hashFiles('stack.yaml.lock') }}
 
-      # Step 4: Install dependencies (only dependencies are built here)
+      # Step 4: Install dependencies only (if needed)
       - name: Install dependencies
         run: stack setup && stack build --only-dependencies
 
-      # Step 5: Build and test the project
-      - name: Build and test
+      # Step 5: Run the tests without building the entire project
+      - name: Run tests
         run: stack test --fast -j4
 
-      # Step 6: Output test results (optional)
+      # Step 6: Upload test logs if the tests fail (with v4)
       - name: Upload test logs
-        if: failure() # Only upload logs if the tests fail
-        uses: actions/upload-artifact@v2
+        if: failure()
+        uses: actions/upload-artifact@v4
         with:
           name: test-logs
           path: |
